@@ -4,8 +4,8 @@
 (setq inhibit-startup-message t)     ; Do without the annoying startup msg
 (setq-default major-mode 'text-mode) ; Make text-mode the default for new buffers
 
-;; Prevent the 'command attempted to use minibuffer while in minibuffer' error
-;; Taken from: https://trey-jackson.blogspot.com/2010/04/emacs-tip-36-abort-minibuffer-when.html
+;;; Prevent the 'command attempted to use minibuffer while in minibuffer' error
+;;; Taken from: https://trey-jackson.blogspot.com/2010/04/emacs-tip-36-abort-minibuffer-when.html
 (defun stop-using-minibuffer ()
   "kill the minibuffer"
   (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
@@ -13,7 +13,7 @@
 
 (add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
 
-;; Bootstrap straight.el
+;; Package manager bootstrapping
 (let ((bootstrap-file (concat user-emacs-directory "straight/repos/straight.el/bootstrap.el"))
       (bootstrap-version 3))
       (unless (file-exists-p bootstrap-file)
@@ -26,7 +26,7 @@
       (load bootstrap-file nil 'nomessage))
 
 ;; Packages
-;;;; Evil-Leader provides an easy way to bind keys under a variable prefix
+;;; Evil-Leader provides an easy way to bind keys under a variable prefix
 (straight-use-package 'evil-leader)
 (global-evil-leader-mode)
 (evil-leader/set-leader "<SPC>")
@@ -37,7 +37,7 @@
  ;;"xb" 'kill-buffer
  ;;"xw" 'delete-window)
 
-;;;; Evil replicates Vim's editing modes
+;;; Evil replicates Vim's editing modes
 (straight-use-package 'evil)
 (evil-mode 1)
 (eval-after-load "evil"
@@ -46,34 +46,54 @@
      (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
      (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
      (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)))
+(evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+(evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
+(evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
+(evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
 
-;;;; Evil-Snipe emulates vim-sneak where the cursor can be quickly placed in the correct location
-;;;; by searching for small snippets of text
+;;; Evil-Snipe emulates vim-sneak where the cursor can be quickly placed in the correct location
+;;; by searching for small snippets of text
 (straight-use-package 'evil-snipe)
 (evil-snipe-mode 1)
 (evil-snipe-override-mode 1)
 
-;;;; Evil-Multiedit allows you to select and edit multiple matches interactively
+;;; Evil-Multiedit allows you to select and edit multiple matches interactively
 (straight-use-package 'evil-multiedit)
 (require 'evil-multiedit)
 (evil-multiedit-default-keybinds)
 
-;;;; Ido enables better interactivity with buffers and files
+;;; Ido enables better interactivity with buffers and files
 (straight-use-package 'ido)
 (ido-mode t)
 
-;;;; Neotree duplicates Vim's NerdTree
+;;; Neotree duplicates Vim's NerdTree
 (straight-use-package 'neotree)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
-;;;; Telephone-line is a new implementation of Powerline for emacs
+;;; All-the-icons provides icons for neotree
+;;;; First time initialization requires running M-x all-the-icons-install-fonts
+(straight-use-package 'all-the-icons)
+
+;;; Telephone-line is a new implementation of Powerline for emacs
 (straight-use-package 'telephone-line)
 (require 'telephone-line-config)
 (telephone-line-evil-config)
 
-;;;; Helm creates a dropdown window for narrowing search results
+;;; Helm creates a dropdown window for narrowing search results
 (straight-use-package 'helm)
 (global-set-key (kbd "M-x") 'helm-M-x)
 
-;;;; Use monokai theme
+;;; Vimish-fold makes it easy to create folds on active regions
+(straight-use-package 'vimish-fold)
+;(global-set-key (kbd "<menu> v f") #'vimish-fold)
+;(global-set-key (kbd "<menu> v v") #'vimish-fold-delete)
+
+;;; Company-mode is a text completion framework for Emacs
+(straight-use-package 'company)
+
+;;; Org-mode is for keeping notes, maintaining TODO lists, planning projects, etc...
+(straight-use-package '(org :local-repo nil))
+
+;;; Use monokai theme
 (straight-use-package 'monokai-theme)
 (load-theme 'monokai t)
