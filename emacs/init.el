@@ -8,7 +8,7 @@
       `((".*",temporary-file-directory t)))
 
 ;; Better defaults from https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#hydra
-(set-frame-parameter nil 'fullscreen nil) ; Enable fullscreen
+;(set-frame-parameter nil 'fullscreen nil) ; Enable fullscreen
 (when window-system
   (blink-cursor-mode 0)  ; Disable cursor blinking
   (scroll-bar-mode 0)    ; Disable the scroll bar
@@ -87,84 +87,105 @@
       (load bootstrap-file nil 'nomessage))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Packages ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq use-package-always-ensure t
-      straight-use-package-by-default t)
-
-(straight-use-package 'use-package)
-
 ;; [evil](https://www.emacswiki.org/emacs/Evil)
-(use-package evil
-  :init
-  (setq evil-want-integration nil)
-  :config
-  (evil-mode 1))
+(setq evil-want-integration nil)
+(straight-use-package 'evil)
+(evil-mode t)
+;; Make all modes start in normal mode
+(setq evil-emacs-state-modes nil)
+(setq evil-insert-state-modes nil)
+(setq evil-motion-state-modes nil)
 
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))  ; Make "ESC" quit the minibuffer
-(define-key evil-insert-state-map (kbd "C-c") 'cua-copy-region)
-(define-key evil-insert-state-map (kbd "C-v") 'cua-paste)
-(define-key evil-insert-state-map (kbd "C-x") 'cua-cut-region)
-(define-key evil-insert-state-map (kbd "C-z") 'undo-tree-undo)
-(define-key evil-insert-state-map (kbd "C-y") 'undo-tree-redo)
-(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-;;(evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
-;;(evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-;;(evil-define-key 'normal neotree-mode-map (kbd "r")   'neotree-refresh)
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
+;; [evil-collection](https://github.com/jojojames/evil-collection)
+(straight-use-package 'evil-collection)
+(evil-collection-init)
 
 ;; [general](https://github.com/noctuid/general.el)
-(use-package general
-  :config
-  (setq general-override-states '(insert
-                                  emacs
-                                  hybrid
-                                  normal
-                                  visual
-                                  motion
-                                  operator
-                                  replace))
-  (general-override-mode)
- ;; (general-define-key
- ;;  :states '(normal visual operator)
- ;;  :prefix "SPC"
- ;;  "ce" 'edit-init-file
- ;;  "cr" 'reload-init-file
- ;;  "ff" 'find-file
- ;;  "fd" 'delete-file
- ;;  "bd" 'bjm/kill-this-buffer
- ;;  "bh" 'evil-prev-buffer
- ;;  "bl" 'evil-next-buffer
- ;;  "wd" 'delete-window
- ;;  "wh" 'evil-window-left
- ;;  "wj" 'evil-window-down
- ;;  "wk" 'evil-window-up
- ;;  "wl" 'evil-window-right
- ;;  "wsh" 'split-window-below
- ;;  "wsv" 'split-window-right
- ;;  "pf" 'projectile-find-file
- ;;  "pk" 'projectile-kill-buffers
- ;;  "pp" 'projectile-switch-project
- ;;  "nt" 'neotree-toggle
- ;;  "nd" 'neotree-dir
- ;;  "ns" 'neotree-show
- ;;  "nh" 'neotree-hide
- ;;  "nf" 'neotree-find
- ;;  )
- ;; (general-define-key
- ;;  :states '(normal visual)
- ;;  :keymaps 'neotree-mode-map
- ;;  "SPC" 'neotree-quick-look
- ;;  "RET" 'neotree-enter
- ;;  "r"   'neotree-refresh
- ;;  "cr"  'neotree-change-root
- ;;  )
-  )
+(straight-use-package 'general)
+(general-define-key
+ :keymaps 'insert
+ "C-c" 'cua-copy-region
+ "C-v" 'cua-paste
+ "C-x" 'cua-cut-region
+ "C-z" 'undo-tree-undo
+ "C-y" 'undo-tree-redo
+ )
+
+;; [hydra](https://github.com/abo-abo/hydra)
+(straight-use-package 'hydra)
+(general-define-key
+ :keymaps 'normal
+ :prefix "SPC"
+ "" 'hydra-menu/body)
+
+(defhydra hydra-menu (:color blue)
+  "
+  _w_ +windows  _b_ +buffers  _f_ +files  _s_ +spaces  _a_ +actions
+  "
+  ("w" hydra-windows/body)
+  ("b" hydra-buffers/body)
+  ("f" hydra-files/body)
+  ("s" hydra-spaces/body)
+  ("a" hydra-actions/body)
+  ("q" nil))
+
+(defhydra hydra-windows (:color blue)
+  "
+  _d_ delete  _h_ move left  _j_ move down  _k_ move up  _l_ move right
+  "
+  ("d" delete-window)
+  ("h" windmove-left)
+  ("j" windmove-down)
+  ("k" windmove-up)
+  ("l" windmove-right)
+  ("q" nil))
+
+(defhydra hydra-spaces (:color blue)
+  "
+  _d_ delete  _j_ next  _k_ prev  _l_ last  _r_ rename
+  "
+  ("d" eyebrowse-close-window-config)
+  ("j" eyebrowse-next-window-config)
+  ("k" eyebrowse-prev-window-config)
+  ("l" eyebrowse-last-window-config)
+  ("r" eyebrowse-rename-window-config)
+  ("q" nil))
+
+(defhydra hydra-buffers (:color blue)
+  "
+  _d_ delete  _j_ next  _k_ prev
+  "
+  ("d" bjm/kill-this-buffer)
+  ("j" evil-next-buffer)
+  ("k" evil-prev-buffer)
+  ("q" nil))
+
+(defhydra hydra-files (:color blue)
+  "
+  _d_ delete  _f_ find  _e_ +edit
+  "
+  ("d" delete-file)
+  ("f" find-file)
+  ("e" hydra-edit-files/body)
+  ("q" nil))
+
+(defhydra hydra-edit-files (:color blue)
+  "
+  _d_ init  _R_ reload
+  "
+  ("d" edit-init-file)
+  ("R" reload-init-file)
+  ("q" nil))
+
+(defhydra hydra-actions (:color blue)
+  "
+  _+_ zoom-in  _-_ zoom-out
+  "
+  ("+" text-scale-increase "in")
+  ("-" text-scale-decrease "out")
+  ("q" nil))
 
 ;; [evil-multiedit](https://github.com/hlissner/evil-multiedit)
 (straight-use-package 'evil-multiedit)
@@ -206,12 +227,6 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (setq-default helm-display-header-line nil)
 
-;; [hydra](https://github.com/abo-abo/hydra)
-(use-package hydra
-  :bind
-  ("SPC f" . hydra-files/body)
-  :config (setq-default hydra-default-hint nil))
-
 ;; [vimish-fold](https://github.com/mrkkrp/vimish-fold)
 (straight-use-package 'vimish-fold)
 ;(global-set-key (kbd "<menu> v f") #'vimish-fold)
@@ -229,6 +244,9 @@
 
 ;; [historian](https://github.com/PythonNut/historian.el)
 (straight-use-package 'historian)
+
+;; [eyebrowse](https://github.com/wasamasa/eyebrowse)
+(straight-use-package 'eyebrowse)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use monokai theme
