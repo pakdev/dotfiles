@@ -8,7 +8,7 @@
       `((".*",temporary-file-directory t)))
 
 ;; Better defaults from https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#hydra
-(set-frame-parameter nil 'fullscreen 'fullboth) ; Enable fullscreen
+(set-frame-parameter nil 'fullscreen nil) ; Enable fullscreen
 (when window-system
   (blink-cursor-mode 0)  ; Disable cursor blinking
   (scroll-bar-mode 0)    ; Disable the scroll bar
