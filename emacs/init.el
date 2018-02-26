@@ -21,11 +21,11 @@
 (setq-default major-mode 'text-mode)  ; Make text-mode the default for new buffers
 (setq-default
  ad-redefintion-action 'accept        ; Silence warnings for redefinition
- confirm-kill-emacs 'yes-or-no-p      ; Confirm before exiting Emacs
- cursor-in-non-selected-windows t     ; Hide the cursor in inactive windows
+ confirm-kill-emacs nil               ; Confirm before exiting Emacs
+ cursor-in-non-selected-windows nil   ; Hide the cursor in inactive windows
  delete-by-moving-to-trash t          ; Delete files to trash
  inhibit-startup-message t            ; Disable start-up screen
- display-time-format "%H:%M"         ; Format the time string
+ display-time-format "%H:%M"          ; Format the time string
  indent-tabs-mode nil                 ; Stop using tabs to indent
  initial-scratch-message ""           ; Empty the initial *scratch* buffer
  ns-use-srgb-colorspace nil           ; Don't use sRGB colors
@@ -116,76 +116,113 @@
 ;; [hydra](https://github.com/abo-abo/hydra)
 (straight-use-package 'hydra)
 (general-define-key
- :keymaps 'normal
+ :keymaps '(normal visual emacs motion)
  :prefix "SPC"
+ :non-normal-prefix "C-SPC"
  "" 'hydra-menu/body)
+
+(defun code-major-mode ()
+  (interactive)
+  (cond
+   ((string= major-mode "python-mode")
+    (hydra-code-python/body))
+   ((or (string= major-mode "lisp-interaction-mode")
+        (string= major-mode "emacs-lisp-mode"))
+    (hydra-code-lisp/body))
+   (t
+    (progn
+      (print major-mode)
+      (hydra-menu/body)))))
 
 (defhydra hydra-menu (:color blue)
   "
-  _w_ +windows  _b_ +buffers  _f_ +files  _s_ +spaces  _a_ +actions
-  "
-  ("w" hydra-windows/body)
-  ("b" hydra-buffers/body)
-  ("f" hydra-files/body)
-  ("s" hydra-spaces/body)
-  ("a" hydra-actions/body)
-  ("q" nil))
+"
+  ("w" hydra-windows/body "+windows" :column "Navigation")
+  ("b" hydra-buffers/body "+buffers")
+  ("f" hydra-files/body "+files")
+  ("z" hydra-zoom/body "+zoom" :column "Actions")
+  ("e" code-major-mode "+code")
+  ("q" nil "quit menu" :column nil))
 
-(defhydra hydra-windows (:color blue)
+(defhydra hydra-windows (:color red)
   "
-  _d_ delete  _h_ move left  _j_ move down  _k_ move up  _l_ move right
-  "
-  ("d" delete-window)
-  ("h" windmove-left)
-  ("j" windmove-down)
-  ("k" windmove-up)
-  ("l" windmove-right)
-  ("q" nil))
+"
+  ("h" windmove-left  "←" :column "Navigation")
+  ("j" windmove-down  "↓")
+  ("k" windmove-up    "↑")
+  ("l" windmove-right "→")
+  ("s" split-window-below "split" :color blue :column "Actions")
+  ("v" split-window-right "split vertically" :color blue)
+  ("d" delete-window "delete")
+  ("f" follow-mode "toggle follow mode")
+  ("u" winner-undo "undo window conf" :column "Undo/Redo")
+  ("r" winner-redo "redo window conf")
+  ("b" balance-windows "balance heights" :column "Sizing")
+  ("m" maximize-window "maximize current")
+  ("M" minimize-window "minimize current")
+  ("q" nil "quit menu" :color blue :column nil))
 
-(defhydra hydra-spaces (:color blue)
+(defhydra hydra-buffers (:color red)
   "
-  _d_ delete  _j_ next  _k_ prev  _l_ last  _r_ rename
-  "
-  ("d" eyebrowse-close-window-config)
-  ("j" eyebrowse-next-window-config)
-  ("k" eyebrowse-prev-window-config)
-  ("l" eyebrowse-last-window-config)
-  ("r" eyebrowse-rename-window-config)
-  ("q" nil))
-
-(defhydra hydra-buffers (:color blue)
-  "
-  _d_ delete  _j_ next  _k_ prev
-  "
-  ("d" bjm/kill-this-buffer)
-  ("j" evil-next-buffer)
-  ("k" evil-prev-buffer)
-  ("q" nil))
+"
+  ("j" evil-next-buffer "↓" :column "Navigation")
+  ("k" evil-prev-buffer "↑")
+  ("d" bjm/kill-this-buffer "delete" :column "Actions")
+  ("q" nil "quit menu" :color blue :column nil))
 
 (defhydra hydra-files (:color blue)
   "
-  _d_ delete  _f_ find  _e_ +edit
-  "
-  ("d" delete-file)
-  ("f" find-file)
-  ("e" hydra-edit-files/body)
-  ("q" nil))
+"
+  ("f" find-file "find" :column "Navigation")
+  ("e" hydra-init-file/body "act on init" :column "Actions")
+  ("d" delete-file "delete")
+  ("q" nil "quit menu" :column nil))
 
-(defhydra hydra-edit-files (:color blue)
+(defhydra hydra-init-file (:color blue)
   "
-  _d_ init  _R_ reload
-  "
-  ("d" edit-init-file)
-  ("R" reload-init-file)
-  ("q" nil))
+"
+  ("d" edit-init-file "edit" :column "Actions")
+  ("R" reload-init-file "reload")
+  ("q" nil "quit menu" :column nil))
 
-(defhydra hydra-actions (:color blue)
-  "
-  _+_ zoom-in  _-_ zoom-out
-  "
+;(defhydra hydra-spaces (:color blue)
+;  "
+;  _d_ delete  _j_ next  _k_ prev  _l_ last  _r_ rename
+;  "
+;  ("d" eyebrowse-close-window-config)
+;  ("j" eyebrowse-next-window-config)
+;  ("k" eyebrowse-prev-window-config)
+;  ("l" eyebrowse-last-window-config)
+;  ("r" eyebrowse-rename-window-config)
+;  ("q" nil))
+
+(defhydra hydra-zoom (:color red)
+  "Text Zoom"
   ("+" text-scale-increase "in")
   ("-" text-scale-decrease "out")
-  ("q" nil))
+  ("q" nil "quit menu" :color blue))
+
+(defhydra hydra-code-python (:color blue)
+  "Python"
+  ("n" next-error "next error" :color red :column "Navigation")
+  ("p" previous-error "prev error" :color red)
+  ("w" (venv-workon) "workon venv...")
+  ("f" elpy-shell-send-defun "function" :column "Evaluation")
+  ("F" elpy-shell-send-defun-and-go "function, REPL")
+  ("r" elpy-shell-send-region-or-buffer "region")
+  ("R" elpy-shell-send-region-or-buffer-and-go "region, REPL")
+  ("b" elpy-shell-send-buffer "buffer")
+  ("B" elpy-shell-send-buffer-and-go "buffer, REPL")
+  ("t" elpy-test "test [case]" :column "Test")
+  ("Q" (kill-buffer "*compilation*") "quit and kill compilation buffer" :column nil)
+  ("q" nil "quit menu" :column nil))
+
+(defhydra hydra-code-lisp (:color blue)
+  "Lisp"
+  ("r" eval-region "region" :column "Evaluation")
+  ("b" eval-buffer "buffer")
+  ("s" eval-last-sexp "last sexp")
+  ("q" nil "quit menu" :column nil))
 
 ;; [evil-multiedit](https://github.com/hlissner/evil-multiedit)
 (straight-use-package 'evil-multiedit)
@@ -241,6 +278,7 @@
 
 ;; [python-mode](https://github.com/jorgenschaefer/elpy)
 (straight-use-package 'elpy)
+(elpy-enable)
 
 ;; [historian](https://github.com/PythonNut/historian.el)
 (straight-use-package 'historian)
@@ -253,17 +291,20 @@
 (straight-use-package 'monokai-theme)
 (load-theme 'monokai t)
 
-;; Customize Emacs
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(add-to-list 'default-frame-alist
+             '(font . "DejaVu Sans Mono-12"))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVuSansMonoForPowerline NF" :foundry "outline" :slant normal :weight normal :height 113 :width normal)))))
+;;;; Customize Emacs
+;;(custom-set-variables
+;; ;; custom-set-variables was added by Custom.
+;; ;; If you edit it by hand, you could mess it up, so be careful.
+;; ;; Your init file should contain only one such instance.
+;; ;; If there is more than one, they won't work right.
+;; )
+;;
+;;(custom-set-faces
+;; ;; custom-set-faces was added by Custom.
+;; ;; If you edit it by hand, you could mess it up, so be careful.
+;; ;; Your init file should contain only one such instance.
+;; ;; If there is more than one, they won't work right.
+;; '(default ((t (:family "DejaVuSansMonoForPowerline NF" :foundry "outline" :slant normal :weight normal :height 113 :width normal)))))
