@@ -8,7 +8,7 @@
       `((".*",temporary-file-directory t)))
 
 ;; Better defaults from https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#hydra
-;(set-frame-parameter nil 'fullscreen nil) ; Enable fullscreen
+(set-frame-parameter nil 'fullscreen 'fullboth) ; Enable fullscreen
 (when window-system
   (blink-cursor-mode 0)  ; Disable cursor blinking
   (scroll-bar-mode 0)    ; Disable the scroll bar
@@ -44,6 +44,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)         ; Replace yes/no prompts with y/n
 (global-hl-line-mode)                 ; Highlight current line
 (global-subword-mode)                 ; Iterate through CamelCase words
+(global-linum-mode t)                 ; Enable line numbers
 (mouse-avoidance-mode 'banish)        ; Avoid collision of mouse with point
 (cd "~/")                             ; Start at the user directory
 
@@ -121,14 +122,14 @@
  :non-normal-prefix "C-SPC"
  "" 'hydra-menu/body)
 
-(defun code-major-mode ()
+(defun mode-specific-actions ()
   (interactive)
   (cond
    ((string= major-mode "python-mode")
-    (hydra-code-python/body))
+    (hydra-python-mode/body))
    ((or (string= major-mode "lisp-interaction-mode")
         (string= major-mode "emacs-lisp-mode"))
-    (hydra-code-lisp/body))
+    (hydra-lisp-mode/body))
    (t
     (progn
       (print major-mode)
@@ -141,8 +142,8 @@
   ("b" hydra-buffers/body "+buffers")
   ("f" hydra-files/body "+files")
   ("z" hydra-zoom/body "+zoom" :column "Actions")
-  ("e" code-major-mode "+code")
-  ("q" nil "quit menu" :column nil))
+  ("m" mode-specific-actions "+mode")
+  ("q" nil "quit" :column nil))
 
 (defhydra hydra-windows (:color red)
   "
@@ -151,6 +152,7 @@
   ("j" windmove-down  "↓")
   ("k" windmove-up    "↑")
   ("l" windmove-right "→")
+  ("a" ace-select-window "ace select")
   ("s" split-window-below "split" :color blue :column "Actions")
   ("v" split-window-right "split vertically" :color blue)
   ("d" delete-window "delete")
@@ -160,7 +162,7 @@
   ("b" balance-windows "balance heights" :column "Sizing")
   ("m" maximize-window "maximize current")
   ("M" minimize-window "minimize current")
-  ("q" nil "quit menu" :color blue :column nil))
+  ("q" nil "quit" :color blue :column nil))
 
 (defhydra hydra-buffers (:color red)
   "
@@ -168,7 +170,7 @@
   ("j" evil-next-buffer "↓" :column "Navigation")
   ("k" evil-prev-buffer "↑")
   ("d" bjm/kill-this-buffer "delete" :column "Actions")
-  ("q" nil "quit menu" :color blue :column nil))
+  ("q" nil "quit" :color blue :column nil))
 
 (defhydra hydra-files (:color blue)
   "
@@ -176,14 +178,14 @@
   ("f" find-file "find" :column "Navigation")
   ("e" hydra-init-file/body "act on init" :column "Actions")
   ("d" delete-file "delete")
-  ("q" nil "quit menu" :column nil))
+  ("q" nil "quit" :column nil))
 
 (defhydra hydra-init-file (:color blue)
   "
 "
   ("d" edit-init-file "edit" :column "Actions")
   ("R" reload-init-file "reload")
-  ("q" nil "quit menu" :column nil))
+  ("q" nil "quit" :column nil))
 
 ;(defhydra hydra-spaces (:color blue)
 ;  "
@@ -200,29 +202,49 @@
   "Text Zoom"
   ("+" text-scale-increase "in")
   ("-" text-scale-decrease "out")
-  ("q" nil "quit menu" :color blue))
+  ("q" nil "quit" :color blue))
 
-(defhydra hydra-code-python (:color blue)
+(defhydra hydra-python-mode (:color blue)
   "Python"
+  ("v" (venv-workon) "set venv" :column "Init")
+  ("p" hydra-python-mode-project/body "project")
+  ("e" hydra-python-mode-eval/body "eval" :column "Actions")
+  ("c" hydra-python-mode-check/body "check")
+  ("t" elpy-test "test [case]")
+  ("h" elpy-doc "show doc")
+  ("Q" (kill-buffer "*compilation*") "quit and kill compilation buffer" :column nil)
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-python-mode-project (:color blue)
+  "Python Project"
+  ("r" elpy-set-project-root "set root")
+  ("f" elpy-find-file "file" :column "Search")
+  ("g" elpy-rgrep-symbol "symbol")
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-python-mode-check (:color blue)
+  "Python Linting"
+  ("x" elpy-check "execute")
   ("n" next-error "next error" :color red :column "Navigation")
   ("p" previous-error "prev error" :color red)
-  ("w" (venv-workon) "workon venv...")
-  ("f" elpy-shell-send-defun "function" :column "Evaluation")
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-python-mode-eval (:color blue)
+  "Python Evaluation"
+  ("f" elpy-shell-send-defun "function")
   ("F" elpy-shell-send-defun-and-go "function, REPL")
   ("r" elpy-shell-send-region-or-buffer "region")
   ("R" elpy-shell-send-region-or-buffer-and-go "region, REPL")
   ("b" elpy-shell-send-buffer "buffer")
   ("B" elpy-shell-send-buffer-and-go "buffer, REPL")
-  ("t" elpy-test "test [case]" :column "Test")
-  ("Q" (kill-buffer "*compilation*") "quit and kill compilation buffer" :column nil)
-  ("q" nil "quit menu" :column nil))
+  ("q" nil "quit" :column nil))
 
-(defhydra hydra-code-lisp (:color blue)
+(defhydra hydra-lisp-mode (:color blue)
   "Lisp"
   ("r" eval-region "region" :column "Evaluation")
   ("b" eval-buffer "buffer")
   ("s" eval-last-sexp "last sexp")
-  ("q" nil "quit menu" :column nil))
+  ("q" nil "quit" :column nil))
 
 ;; [evil-multiedit](https://github.com/hlissner/evil-multiedit)
 (straight-use-package 'evil-multiedit)
@@ -286,25 +308,23 @@
 ;; [eyebrowse](https://github.com/wasamasa/eyebrowse)
 (straight-use-package 'eyebrowse)
 
+;; [ace-window](https://github.com/abo-abo/ace-window)
+(straight-use-package 'ace-window)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use monokai theme
 (straight-use-package 'monokai-theme)
 (load-theme 'monokai t)
 
-(add-to-list 'default-frame-alist
-             '(font . "DejaVu Sans Mono-12"))
-
-;;;; Customize Emacs
-;;(custom-set-variables
-;; ;; custom-set-variables was added by Custom.
-;; ;; If you edit it by hand, you could mess it up, so be careful.
-;; ;; Your init file should contain only one such instance.
-;; ;; If there is more than one, they won't work right.
-;; )
-;;
-;;(custom-set-faces
-;; ;; custom-set-faces was added by Custom.
-;; ;; If you edit it by hand, you could mess it up, so be careful.
-;; ;; Your init file should contain only one such instance.
-;; ;; If there is more than one, they won't work right.
-;; '(default ((t (:family "DejaVuSansMonoForPowerline NF" :foundry "outline" :slant normal :weight normal :height 113 :width normal)))))
+;; Change font and size
+(defvar windows-font "DejaVu Sans Mono")
+(defvar windows-font-size 13)
+(defvar linux-font "DejaVu Sans Mono")
+(defvar linux-font-size 13)
+(cond
+ ((string= system-type "windows-nt") ; Microsoft Windows
+  (when (member windows-font (font-family-list))
+    (set-face-attribute 'default nil :font (format "%s-%s" windows-font windows-font-size))))
+ ((string= system-type "gnu/linux")  ; Linux
+  (when (member linux-font (font-family-list))
+    (set-face-attribute 'default nil :font (format "%s-%s" linux-font linux-font-size)))))
