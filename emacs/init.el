@@ -127,6 +127,8 @@
   (cond
    ((string= major-mode "python-mode")
     (hydra-python-mode/body))
+   ((string= major-mode "racket-mode")
+    (hydra-racket-mode/body))
    ((or (string= major-mode "lisp-interaction-mode")
         (string= major-mode "emacs-lisp-mode"))
     (hydra-lisp-mode/body))
@@ -141,6 +143,7 @@
   ("w" hydra-windows/body "+windows" :column "Navigation")
   ("b" hydra-buffers/body "+buffers")
   ("f" hydra-files/body "+files")
+
   ("z" hydra-zoom/body "+zoom" :column "Actions")
   ("m" mode-specific-actions "+mode")
   ("q" nil "quit" :column nil))
@@ -207,36 +210,41 @@
 (defhydra hydra-python-mode (:color blue)
   "Python"
   ("v" (venv-workon) "set venv" :column "Init")
-  ("p" hydra-python-mode-project/body "project")
-  ("e" hydra-python-mode-eval/body "eval" :column "Actions")
-  ("c" hydra-python-mode-check/body "check")
-  ("t" elpy-test "test [case]")
-  ("h" elpy-doc "show doc")
+  ("pr" elpy-set-project-root "set root" :column "Project")
+  ("pf" elpy-find-file "find file")
+  ("pg" elpy-rgrep-symbol "grep symbol")
+  ("sf" elpy-shell-send-defun "function" :column "Send to REPL")
+  ("sF" elpy-shell-send-defun-and-go "function, REPL")
+  ("sr" elpy-shell-send-region-or-buffer "region")
+  ("sR" elpy-shell-send-region-or-buffer-and-go "region, REPL")
+  ("sb" elpy-shell-send-buffer "buffer")
+  ("sB" elpy-shell-send-buffer-and-go "buffer, REPL")
+  ("c", elpy-check "check" :column "Check")
+  ("n" next-error "next error" :color red)
+  ("p" previous-error "prev error" :color red)
+  ("t" elpy-test "test [case]" :column "Test")
+  ("h" elpy-doc "show doc" :column "Learn")
   ("Q" (kill-buffer "*compilation*") "quit and kill compilation buffer" :column nil)
   ("q" nil "quit" :column nil))
 
-(defhydra hydra-python-mode-project (:color blue)
-  "Python Project"
-  ("r" elpy-set-project-root "set root")
-  ("f" elpy-find-file "file" :column "Search")
-  ("g" elpy-rgrep-symbol "symbol")
-  ("q" nil "quit" :column nil))
-
-(defhydra hydra-python-mode-check (:color blue)
-  "Python Linting"
-  ("x" elpy-check "execute")
-  ("n" next-error "next error" :color red :column "Navigation")
-  ("p" previous-error "prev error" :color red)
-  ("q" nil "quit" :column nil))
-
-(defhydra hydra-python-mode-eval (:color blue)
-  "Python Evaluation"
-  ("f" elpy-shell-send-defun "function")
-  ("F" elpy-shell-send-defun-and-go "function, REPL")
-  ("r" elpy-shell-send-region-or-buffer "region")
-  ("R" elpy-shell-send-region-or-buffer-and-go "region, REPL")
-  ("b" elpy-shell-send-buffer "buffer")
-  ("B" elpy-shell-send-buffer-and-go "buffer, REPL")
+(defhydra hydra-racket-mode (:color blue)
+  "Racket"
+  ;("f" racket-racket "racket <file>")
+  ("sb" racket-run "buffer" :column "Send to REPL")
+  ("sr" racket-send-region "region")
+  ("sd" racket-send-definition "definition")
+  ("sl" racket-send-last-sexp "last sexp")
+  ("vd" racket-visit-definition "definition" :column "Visit")
+  ("vm" racket-visit-module "module")
+  ("vp" racket-unvisit "previous")
+  ("vr" racket-open-require-path "require")
+  ("ls" racket-describe "describe" :column "Learn")
+  ("ld" racket-doc "document")
+  ("fa" racket-align "align" :column "Format")
+  ("fu" racket-unalign "unalign")
+  ("fr" racket-tidy-requires "tidy requires")
+  ("tr" racket-trim-requires "trim requires")
+  ("t" racket-test "test" :column "Test")
   ("q" nil "quit" :column nil))
 
 (defhydra hydra-lisp-mode (:color blue)
@@ -310,6 +318,17 @@
 
 ;; [ace-window](https://github.com/abo-abo/ace-window)
 (straight-use-package 'ace-window)
+
+;; [racket-mode](https://github.com/greghendershott/racket-mode)
+(straight-use-package 'racket-mode)
+
+;; [smartparens](https://github.com/Fuco1/smartparens)
+(straight-use-package 'smartparens)
+(require 'smartparens-config)
+;; Automatically enable smartparens based on mode
+(add-hook 'racket-mode-hook #'smartparens-mode)
+(add-hook 'lisp-interaction-mode-hook #'smartparens-mode)
+(smartparens-strict-mode t) ; enforce that pairs are always balanced
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use monokai theme
