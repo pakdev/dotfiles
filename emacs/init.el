@@ -130,14 +130,16 @@
    ((or (string= major-mode "lisp-interaction-mode")
         (string= major-mode "emacs-lisp-mode"))
     (hydra-lisp-mode/body))
+   ((or (string= major-mode "c++-mode")
+        (string= major-mode "c-mode"))
+    (hydra-c-mode/body))
    (t
     (progn
       (print major-mode)
       (hydra-menu/body)))))
 
 (defhydra hydra-menu (:color blue)
-  "
-"
+  "--------------------------"
   ("w" hydra-windows/body "+windows" :column "Navigation")
   ("b" hydra-buffers/body "+buffers")
   ("f" hydra-files/body "+files")
@@ -145,7 +147,7 @@
   ("m" mode-specific-actions "+mode")
   ("q" nil "quit" :column nil))
 
-(defhydra hydra-windows (:color red)
+(defhydra hydra-windows (:color blue)
   "
 "
   ("h" windmove-left  "←" :column "Navigation")
@@ -164,11 +166,12 @@
   ("M" minimize-window "minimize current")
   ("q" nil "quit" :color blue :column nil))
 
-(defhydra hydra-buffers (:color red)
+(defhydra hydra-buffers (:color blue)
   "
 "
   ("j" evil-next-buffer "↓" :column "Navigation")
   ("k" evil-prev-buffer "↑")
+  ("l" helm-buffers-list "list")
   ("d" bjm/kill-this-buffer "delete" :column "Actions")
   ("q" nil "quit" :color blue :column nil))
 
@@ -210,6 +213,7 @@
   ("p" hydra-python-mode-project/body "project")
   ("e" hydra-python-mode-eval/body "eval" :column "Actions")
   ("c" hydra-python-mode-check/body "check")
+  ("r" hydra-python-mode-refactor/body "refactor")
   ("t" elpy-test "test [case]")
   ("h" elpy-doc "show doc")
   ("Q" (kill-buffer "*compilation*") "quit and kill compilation buffer" :column nil)
@@ -222,13 +226,6 @@
   ("g" elpy-rgrep-symbol "symbol")
   ("q" nil "quit" :column nil))
 
-(defhydra hydra-python-mode-check (:color blue)
-  "Python Linting"
-  ("x" elpy-check "execute")
-  ("n" next-error "next error" :color red :column "Navigation")
-  ("p" previous-error "prev error" :color red)
-  ("q" nil "quit" :column nil))
-
 (defhydra hydra-python-mode-eval (:color blue)
   "Python Evaluation"
   ("f" elpy-shell-send-defun "function")
@@ -239,11 +236,45 @@
   ("B" elpy-shell-send-buffer-and-go "buffer, REPL")
   ("q" nil "quit" :column nil))
 
+(defhydra hydra-python-mode-check (:color blue)
+  "Python Linting"
+  ("x" elpy-check "execute")
+  ("n" next-error "next error" :color red :column "Navigation")
+  ("p" previous-error "prev error" :color red)
+  ("q" nil "quit" :column nil))
+
+(defhydra hyrda-python-mode-refactor (:color blue)
+  "Python Refactoring"
+  ("x" elpy-refactor "execute")
+  ("f" elpy-format-code "format")
+  ("q" nil "quit"))
+
 (defhydra hydra-lisp-mode (:color blue)
   "Lisp"
   ("r" eval-region "region" :column "Evaluation")
   ("b" eval-buffer "buffer")
   ("s" eval-last-sexp "last sexp")
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-c-mode (:color blue)
+  "C/C++"
+  ("f" hydra-c-mode-find/body "find" :column "Navigation")
+  ("t" hydra-c-mode-tags/body "tags")
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-c-mode-find (:color blue)
+  "C/C++ Finding"
+  ("s" ggtags-find-other-symbol "symbol")
+  ("t" ggtags-find-tag-dwim "tag")
+  ("r" ggtags-find-reference "reference")
+  ("f" ggtags-find-file "file")
+  ("q" nil "quit" :column nil))
+
+(defhydra hydra-c-mode-tags (:color blue)
+  "C/C++ Tags"
+  ("n" ggtags-next-mark "next")
+  ("p" ggtags-prev-mark "prev")
+  ("h" ggtags-view-tag-history "history")
   ("q" nil "quit" :column nil))
 
 ;; [evil-multiedit](https://github.com/hlissner/evil-multiedit)
@@ -301,6 +332,15 @@
 ;; [python-mode](https://github.com/jorgenschaefer/elpy)
 (straight-use-package 'elpy)
 (elpy-enable)
+(with-eval-after-load 'python
+  (defun python-shell-completion-native-try ()
+    "Return non-nil if can trigger native compilation."
+    (let ((python-shell-completion-native-enable t)
+          (python-shell-completion-native-output-timeout
+           python-shell-completion-native-try-output-timeout))
+      (python-shell-completion-native-get-completions
+       (get-buffer-process (current-buffer))
+       nil "_"))))
 
 ;; [historian](https://github.com/PythonNut/historian.el)
 (straight-use-package 'historian)
@@ -310,6 +350,16 @@
 
 ;; [ace-window](https://github.com/abo-abo/ace-window)
 (straight-use-package 'ace-window)
+
+;; [ggtags](https://github.com/leoliu/ggtags)
+(straight-use-package 'ggtags)
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+              (ggtags-mode 1))))
+
+;; [helm-gtags](https://github.com/suzuki/emacs-helm-gtags)
+(straight-use-package 'helm-gtags)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Appearance ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Use monokai theme
