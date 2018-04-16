@@ -127,6 +127,8 @@
   (cond
    ((string= major-mode "python-mode")
     (hydra-python-mode/body))
+   ((string= major-mode "racket-mode")
+    (hydra-racket-mode/body))
    ((or (string= major-mode "lisp-interaction-mode")
         (string= major-mode "emacs-lisp-mode"))
     (hydra-lisp-mode/body))
@@ -226,6 +228,13 @@
   ("g" elpy-rgrep-symbol "symbol")
   ("q" nil "quit" :column nil))
 
+(defhydra hydra-python-mode-check (:color blue)
+  "Python Linting"
+  ("x" elpy-check "execute")
+  ("n" next-error "next error" :color red :column "Navigation")
+  ("p" previous-error "prev error" :color red)
+  ("q" nil "quit" :column nil))
+
 (defhydra hydra-python-mode-eval (:color blue)
   "Python Evaluation"
   ("f" elpy-shell-send-defun "function")
@@ -234,20 +243,33 @@
   ("R" elpy-shell-send-region-or-buffer-and-go "region, REPL")
   ("b" elpy-shell-send-buffer "buffer")
   ("B" elpy-shell-send-buffer-and-go "buffer, REPL")
-  ("q" nil "quit" :column nil))
-
-(defhydra hydra-python-mode-check (:color blue)
-  "Python Linting"
-  ("x" elpy-check "execute")
-  ("n" next-error "next error" :color red :column "Navigation")
-  ("p" previous-error "prev error" :color red)
-  ("q" nil "quit" :column nil))
+  ("q" nil "quit" :column nill))
 
 (defhydra hyrda-python-mode-refactor (:color blue)
   "Python Refactoring"
   ("x" elpy-refactor "execute")
   ("f" elpy-format-code "format")
   ("q" nil "quit"))
+
+(defhydra hydra-racket-mode (:color blue)
+  "Racket"
+  ;("f" racket-racket "racket <file>")
+  ("sb" racket-run "buffer" :column "Send to REPL")
+  ("sr" racket-send-region "region")
+  ("sd" racket-send-definition "definition")
+  ("sl" racket-send-last-sexp "last sexp")
+  ("vd" racket-visit-definition "definition" :column "Visit")
+  ("vm" racket-visit-module "module")
+  ("vp" racket-unvisit "previous")
+  ("vr" racket-open-require-path "require")
+  ("ls" racket-describe "describe" :column "Learn")
+  ("ld" racket-doc "document")
+  ("fa" racket-align "align" :column "Format")
+  ("fu" racket-unalign "unalign")
+  ("fr" racket-tidy-requires "tidy requires")
+  ("tr" racket-trim-requires "trim requires")
+  ("t" racket-test "test" :column "Test")
+  ("q" nil "quit" :column nil))
 
 (defhydra hydra-lisp-mode (:color blue)
   "Lisp"
@@ -350,6 +372,17 @@
 
 ;; [ace-window](https://github.com/abo-abo/ace-window)
 (straight-use-package 'ace-window)
+
+;; [racket-mode](https://github.com/greghendershott/racket-mode)
+(straight-use-package 'racket-mode)
+
+;; [smartparens](https://github.com/Fuco1/smartparens)
+(straight-use-package 'smartparens)
+(require 'smartparens-config)
+;; Automatically enable smartparens based on mode
+(add-hook 'racket-mode-hook #'smartparens-mode)
+(add-hook 'lisp-interaction-mode-hook #'smartparens-mode)
+(smartparens-strict-mode t) ; enforce that pairs are always balanced
 
 ;; [ggtags](https://github.com/leoliu/ggtags)
 (straight-use-package 'ggtags)
