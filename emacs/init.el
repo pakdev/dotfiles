@@ -403,7 +403,7 @@
 (defvar windows-font "DejaVu Sans Mono")
 (defvar windows-font-size 13)
 (defvar linux-font "DejaVu Sans Mono")
-(defvar linux-font-size 13)
+(defvar linux-font-size 30)
 (cond
  ((string= system-type "windows-nt") ; Microsoft Windows
   (when (member windows-font (font-family-list))
