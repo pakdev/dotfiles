@@ -7,3 +7,6 @@
 [submodule "slstatus"]
 	path = slstatus
 	url = git://git.suckless.org/slstatus
+[submodule "slock"]
+	path = slock
+	url = git://git.suckless.org/slock
