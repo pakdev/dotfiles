@@ -58,8 +58,10 @@ bindkey "$terminfo[cud1]" down-line-or-beginning-search
 # backward and forward word with option+left/right
 bindkey '^[^[[D' backward-word
 bindkey '^[b' backward-word
+bindkey '^[[1;5D' backward-word
 bindkey '^[^[[C' forward-word
 bindkey '^[f' forward-word
+bindkey '^[[1;5C' forward-word
 
 # to to the beggining/end of line with fn+left/right or home/end
 bindkey "${terminfo[khome]}" beginning-of-line
