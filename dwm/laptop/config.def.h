@@ -1,9 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const char *fonts[] = {
-	"Source Code Pro:size=8"
-};
+static const char *fonts[]          = { "Source Code Pro:size=8" };
 static const char dmenufont[]       = "Source Code Pro:size=8";
 static const char normbordercolor[] = "#444444";
 static const char normbgcolor[]     = "#222222";
