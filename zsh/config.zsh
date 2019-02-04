@@ -1,6 +1,7 @@
 #!/bin/zsh
 export LSCOLORS='exfxcxdxbxegedabagacad'
 export CLICOLOR=true
+export _JAVA_AWT_WM_NONREPARENTING=1
 
 fpath=($DOTFILES/functions $fpath)
 
