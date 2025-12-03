@@ -1,1 +1,8 @@
-.vim
+# Ignore backup files
+*.bak
+*.backup
+*~
+
+# Ignore system files
+.DS_Store
+Thumbs.db
