@@ -1,0 +1,53 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$username\
+$directory\
+${custom.flox_env}\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$character"""
+
+[directory]
+style = "cyan"
+truncation_length = 0
+fish_style_pwd_dir_length = 1
+format = "[$path]($style) "
+
+[character]
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+
+[git_branch]
+format = "[$branch]($style)"
+style = "bright-black"
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
+style = "cyan"
+conflicted = "​"
+untracked = "​"
+modified = "​"
+staged = "​"
+renamed = "​"
+deleted = "​"
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "yellow"
+
+[custom.flox_env]
+command = '''echo "$FLOX_PROMPT_ENVIRONMENTS" | awk '{for(i=NF;i>=1;i--) printf "%s%s", $i, (i>1?" ":"")}' '''
+when = 'test -n "$FLOX_ENV"'
+format = "[$output]($style) "
+style = "bright-purple"
+

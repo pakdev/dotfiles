@@ -1,0 +1,12 @@
+os:
+  editPreset: 'nvim'
+gui:
+  theme:
+    selectedLineBgColor:
+      - reverse
+    selectedRangeBgColor:
+      - reverse
+git:
+  pagers:
+    - colorArg: never
+      pager: delta --dark --paging=never --line-numbers --features chameleon
