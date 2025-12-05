@@ -11,3 +11,6 @@
   external = difft
 [include]
   path = ~/.config/delta/themes.gitconfig
+[user]
+	email = peter.kurlak@emerson.com
+	name = Peter Kurlak
