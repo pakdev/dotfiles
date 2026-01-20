@@ -9,6 +9,14 @@ $git_state\
 $git_status\
 $cmd_duration\
 $line_break\
+$python\
+$nodejs\
+$rust\
+$golang\
+$dotnet\
+$java\
+$ruby\
+$php\
 $character"""
 
 [directory]
