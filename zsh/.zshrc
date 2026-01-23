@@ -158,6 +158,12 @@ export VISUAL='nvim'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# OpenCode alias
+alias oc='opencode'
+
+# Lazygit alias
+alias lg='lazygit'
+
 # Added by ni-dev-tools setup - Go tools PATH
 export PATH="$HOME/go/bin:$PATH"
 
