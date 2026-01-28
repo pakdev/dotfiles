@@ -8,6 +8,11 @@ $git_branch\
 $git_state\
 $git_status\
 $cmd_duration\
+$python\
+$rust\
+$golang\
+$nodejs\
+$dotnet\
 $line_break\
 $python\
 $nodejs\
@@ -58,4 +63,29 @@ command = '''echo "$FLOX_PROMPT_ENVIRONMENTS" | awk '{for(i=NF;i>=1;i--) printf 
 when = 'test -n "$FLOX_ENV"'
 format = "[$output]($style) "
 style = "bright-purple"
+
+[python]
+format = "[$symbol$version]($style) "
+symbol = "🐍 "
+style = "yellow"
+
+[rust]
+format = "[$symbol$version]($style) "
+symbol = "🦀 "
+style = "red"
+
+[golang]
+format = "[$symbol$version]($style) "
+symbol = "🐹 "
+style = "cyan"
+
+[nodejs]
+format = "[$symbol$version]($style) "
+symbol = "⬢ "
+style = "green"
+
+[dotnet]
+format = "[$symbol$version]($style) "
+symbol = ".NET "
+style = "blue"
 

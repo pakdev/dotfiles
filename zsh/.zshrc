@@ -169,3 +169,9 @@ export PATH="$HOME/go/bin:$PATH"
 
 # Initialize Starship prompt
 eval "$(starship init zsh)"
+
+# bun completions
+[ -s "/home/peter/.bun/_bun" ] && source "/home/peter/.bun/_bun"
+
+# Use GPG agent for SSH authentication
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)

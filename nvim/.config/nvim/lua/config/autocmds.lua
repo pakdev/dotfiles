@@ -14,3 +14,14 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     vim.bo.filetype = "helm"
   end,
 })
+
+-- Set Dockerfile indentation to 4 spaces
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "dockerfile", "docker-compose" },
+  callback = function()
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+    vim.bo.softtabstop = 4
+    vim.bo.expandtab = true
+  end,
+})
