@@ -1,5 +1,5 @@
 os:
-  editPreset: 'nvim'
+  editPreset: "nvim"
 gui:
   theme:
     selectedLineBgColor:
@@ -10,3 +10,9 @@ git:
   pagers:
     - colorArg: never
       pager: delta --dark --paging=never --line-numbers --features chameleon
+customCommands:
+  - key: "U"
+    command: "git submodule update --init --recursive --force"
+    context: "files"
+    description: "Force update and reset all submodules"
+    output: log
