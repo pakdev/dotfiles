@@ -8,11 +8,6 @@ $git_branch\
 $git_state\
 $git_status\
 $cmd_duration\
-$python\
-$rust\
-$golang\
-$nodejs\
-$dotnet\
 $line_break\
 $python\
 $nodejs\
