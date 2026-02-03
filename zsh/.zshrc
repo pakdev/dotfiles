@@ -164,6 +164,9 @@ alias oc='opencode'
 # Lazygit alias
 alias lg='lazygit'
 
+# Docker summary alias (id, name, image)
+alias dss='docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}"'
+
 # Added by ni-dev-tools setup - Go tools PATH
 export PATH="$HOME/go/bin:$PATH"
 
