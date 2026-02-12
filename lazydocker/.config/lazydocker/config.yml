@@ -1,4 +1,5 @@
 gui:
+  returnImmediately: false
   scrollHeight: 2
   language: auto
   theme:
@@ -21,6 +22,7 @@ gui:
 logs:
   since: 60m
 commandTemplates:
+  dockerShell: "docker exec -it {{ .Container.ID }} /bin/sh"
   restartService: '{{ .DockerCompose }} restart {{ .Service.Name }}'
   startService: '{{ .DockerCompose }} start {{ .Service.Name }}'
   upService: '{{ .DockerCompose }} up -d {{ .Service.Name }}'
@@ -84,6 +86,16 @@ bulkCommands:
     attach: false
     shell: false
     command: '{{ .DockerCompose }} down --volumes --rmi all'
+  serviceNames: []
+customCommands:
+  containers:
+  - name: shell
+    attach: true
+    command: 'docker exec -it {{ .Container.ID }} /bin/sh'
+    serviceNames: []
+  - name: bash
+    attach: true
+    command: 'docker exec -it {{ .Container.ID }} bash'
     serviceNames: []
 oS:
   openCommand: sh -c "xdg-open {{filename}} >/dev/null"
