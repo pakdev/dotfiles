@@ -14,7 +14,7 @@ return {
     optional = true,
     opts = {
       formatters_by_ft = {
-        toml = { "taplo" },
+        toml = { "trim_whitespace", "taplo" },
       },
     },
   },
