@@ -6,3 +6,6 @@
 # Ignore system files
 .DS_Store
 Thumbs.db
+
+# Ignore LazyGit state
+state.yml

@@ -179,7 +179,10 @@ export VISUAL='nvim'
 alias oc='opencode'
 
 # Lazygit alias
-alias lg='lazygit'
+alias lg='lazygit --use-config-dir ~/.config/lazygit'
+
+# Lazydocker alias
+alias ld='lazydocker'
 
 # Docker summary alias (id, name, image)
 alias dss='docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}"'
