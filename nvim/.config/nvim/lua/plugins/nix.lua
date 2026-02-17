@@ -18,4 +18,16 @@ return {
       },
     },
   },
+  -- Lazy-load nil_ls only for Nix files
+  {
+    "neovim/nvim-lspconfig",
+    ft = { "nix" },
+    opts = {
+      servers = {
+        nil_ls = {
+          mason = false,
+        },
+      },
+    },
+  },
 }

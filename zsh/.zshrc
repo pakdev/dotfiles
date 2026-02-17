@@ -72,7 +72,6 @@ COMPLETION_WAITING_DOTS="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git 
-  direnv 
   command-not-found 
   common-aliases 
   docker 
@@ -82,12 +81,30 @@ plugins=(
   sudo 
   web-search 
   history-substring-search 
-  zsh-autosuggestions 
-  zsh-syntax-highlighting
   zoxide
 )
 
+# Silence direnv log output (must be before any direnv hook)
+export DIRENV_LOG_FORMAT=""
+
 source $ZSH/oh-my-zsh.sh
+
+# Zsh plugins (macOS + non-mac)
+if command -v brew >/dev/null 2>&1; then
+  ZSH_PLUGIN_PREFIX="$(brew --prefix)/share"
+elif [[ -d /usr/local/share ]]; then
+  ZSH_PLUGIN_PREFIX="/usr/local/share"
+else
+  ZSH_PLUGIN_PREFIX="/usr/share"
+fi
+
+if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "$ZSH_PLUGIN_PREFIX/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
+
+if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
 
 # Enhanced completion settings
 autoload -Uz compinit
@@ -172,6 +189,9 @@ export PATH="$HOME/go/bin:$PATH"
 
 # Initialize Starship prompt
 eval "$(starship init zsh)"
+
+# Initialize direnv (DIRENV_LOG_FORMAT="" suppresses the "direnv: export" line)
+eval "$(direnv hook zsh)"
 
 # bun completions
 [ -s "/home/peter/.bun/_bun" ] && source "/home/peter/.bun/_bun"

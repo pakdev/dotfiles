@@ -1,1 +1,12 @@
-/home/peter/.config/omarchy/current/theme/neovim.lua
+return {
+  {
+    "dracula/vim",
+    name = "dracula",
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "dracula",
+    },
+  },
+}
