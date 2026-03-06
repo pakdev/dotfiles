@@ -201,3 +201,5 @@ eval "$(direnv hook zsh)"
 
 # Use GPG agent for SSH authentication
 export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+
+export STOWMAN_DOTDIR=~/git/dotfiles/
