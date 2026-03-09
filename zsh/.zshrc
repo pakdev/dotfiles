@@ -100,11 +100,11 @@ fi
 
 if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
   source "$ZSH_PLUGIN_PREFIX/zsh-autosuggestions/zsh-autosuggestions.zsh"
+elif [[ -f "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-  source "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
+# We will source zsh-syntax-highlighting at the very end of the file.
 
 # Enhanced completion settings
 autoload -Uz compinit
@@ -203,3 +203,10 @@ eval "$(direnv hook zsh)"
 export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 
 export STOWMAN_DOTDIR=~/git/dotfiles/
+
+# Source zsh-syntax-highlighting at the very end of the file
+if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+elif [[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
