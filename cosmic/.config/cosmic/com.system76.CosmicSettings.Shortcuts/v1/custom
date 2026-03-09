@@ -1,0 +1,14 @@
+{
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "d",
+    ): Spawn("ghostty -e lazydocker"),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "t",
+    ): Spawn("ghostty"),
+}
