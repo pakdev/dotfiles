@@ -4,6 +4,18 @@
     // "oh-my-opencode@latest",
     "opencode-antigravity-auth@latest"
   ],
+  "agent": {
+    "pr": {
+      "mode": "primary",
+      "model": "github-copilot/gpt-5.2-codex",
+      "prompt": "{file:./prompts/pr.txt}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    }
+  },
   "provider": {
     "google": {
       "name": "Google",
