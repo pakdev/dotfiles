@@ -160,6 +160,9 @@ export PATH="$HOME/.nix-profile/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
 
+# Stowman.sh config
+export STOWMAN_DOTDIR="$HOME/git/dotfiles/"
+
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
