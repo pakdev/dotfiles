@@ -10,6 +10,9 @@ git:
   pagers:
     - colorArg: never
       pager: delta --dark --paging=never --line-numbers --features chameleon
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
 customCommands:
   - key: "U"
     command: "git submodule update --init --recursive --force"
