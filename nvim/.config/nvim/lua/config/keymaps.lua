@@ -15,3 +15,6 @@ end, { desc = "Beautify JSON (jq)" })
 -- Override ZQ and ZZ to quit all windows (including NeoTree)
 vim.keymap.set("n", "ZQ", "<cmd>qa<cr>", { desc = "Quit all windows" })
 vim.keymap.set("n", "ZZ", "<cmd>wqa<cr>", { desc = "Save all and quit all windows" })
+
+-- NDJSON: pretty-print each line with jq
+vim.keymap.set("n", "<leader>jM", "<cmd>%!jq -M .<cr>", { desc = "Pretty-print NDJSON with jq" })
