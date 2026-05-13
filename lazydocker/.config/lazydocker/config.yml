@@ -19,6 +19,7 @@ gui:
   screenMode: normal
   containerStatusHealthStyle: long
   border: ""
+  showProjectSection: false
 logs:
   since: 60m
 commandTemplates:

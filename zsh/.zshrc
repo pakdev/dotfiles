@@ -190,6 +190,13 @@ alias ld='lazydocker'
 # Docker summary alias (id, name, image)
 alias dss='docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}"'
 
+# Pete SSH reverse tunnel aliases
+alias pete-ssh-tunnel-status='systemctl --user status pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-logs='journalctl --user -u pete-ssh-tunnel.service -f'
+alias pete-ssh-tunnel-start='systemctl --user start pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-stop='systemctl --user stop pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-restart='systemctl --user restart pete-ssh-tunnel.service'
+
 # Added by ni-dev-tools setup - Go tools PATH
 export PATH="$HOME/go/bin:$PATH"
 
