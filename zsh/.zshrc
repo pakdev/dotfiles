@@ -151,6 +151,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # Add devenv to PATH
 export PATH="$HOME/.nix-profile/bin:$PATH"
 
+# Initialize pyenv so local Python versions resolve through shims.
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -218,6 +222,12 @@ eval "$(starship init zsh)"
 
 # Initialize direnv (DIRENV_LOG_FORMAT="" suppresses the "direnv: export" line)
 eval "$(direnv hook zsh)"
+
+# Initialize pyenv after PATH setup so its shims take precedence.
+eval "$(pyenv init - zsh)"
+
+# Initialize mise
+eval "$(mise activate zsh)"
 
 # bun completions
 [ -s "/home/peter/.bun/_bun" ] && source "/home/peter/.bun/_bun"

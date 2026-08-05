@@ -10,14 +10,23 @@ git:
   diffRenderers:
     - colorArg: never
       command: delta --dark --paging=never --line-numbers --features chameleon
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 customCommands:
   - key: "t"
     command: "open -na Ghostty.app --args -e zsh -lc 'cd {{.SelectedWorktree.Path | quote}} && exec zsh -l'"
     context: "worktrees"
     description: "Open selected worktree in Ghostty"
+  - key: "O"
+    context: "global"
+    description: "Launch OpenCode"
+    command: "opencode"
+    output: terminal
+  - key: "C"
+    context: "global"
+    description: "Launch GitHub Copilot with YOLO enabled"
+    command: "copilot --yolo"
     output: terminal
   - key: "U"
     command: "git submodule update --init --recursive --force"

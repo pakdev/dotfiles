@@ -23,7 +23,9 @@ $character"""
 [directory]
 style = "cyan"
 truncation_length = 0
-fish_style_pwd_dir_length = 1
+truncate_to_repo = false
+home_symbol = "~"
+fish_style_pwd_dir_length = 0
 format = "[$path]($style) "
 
 [character]
