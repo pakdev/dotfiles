@@ -197,6 +197,19 @@ alias pete-ssh-tunnel-start='systemctl --user start pete-ssh-tunnel.service'
 alias pete-ssh-tunnel-stop='systemctl --user stop pete-ssh-tunnel.service'
 alias pete-ssh-tunnel-restart='systemctl --user restart pete-ssh-tunnel.service'
 
+# Open Yazi and change to its selected directory on exit.
+function y() {
+  local tmp
+  tmp="$(mktemp -t 'yazi-cwd.XXXXXX')"
+  yazi "$@" --cwd-file="$tmp"
+
+  if read -r cwd < "$tmp" && [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+    builtin cd -- "$cwd"
+  fi
+
+  rm -f -- "$tmp"
+}
+
 # Added by ni-dev-tools setup - Go tools PATH
 export PATH="$HOME/go/bin:$PATH"
 
@@ -230,3 +243,68 @@ compinit
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# mise
+eval "$(mise activate zsh)"
+
+# === agent-worktree BEGIN ===
+# NOTE: Don't use 'path'/'status' as variable names - zsh reserves them
+wt() {
+  local wt_bin path_file target_path wt_status wt_arg path_file_inserted
+  local -a wt_args
+  if [[ -n "$ZSH_VERSION" ]]; then
+    wt_bin=$(whence -p wt 2>/dev/null)
+  else
+    wt_bin=$(type -P wt 2>/dev/null)
+  fi
+  if [[ -z "$wt_bin" ]]; then
+    echo "wt: binary not found. Install: npm install -g agent-worktree" >&2
+    return 1
+  fi
+  # Pass through if -h/--help anywhere in args
+  case " $* " in
+    *" -h "*|*" --help "*) "$wt_bin" "$@"; return ;;
+  esac
+  case "$1" in
+    cd|new|rm|mv|merge|clean|run)
+      # Use mktemp so concurrent calls (and subshells where $$ is the parent
+      # PID) get unique files; fall back to PID-based name if mktemp missing.
+      path_file=$(mktemp 2>/dev/null) || path_file="${TMPDIR:-/tmp}/wt-path-$$"
+      # `wt run -- <agent>` treats every argument after `--` as belonging to
+      # the agent, so inject the wrapper option before that delimiter.
+      wt_args=()
+      path_file_inserted=
+      for wt_arg in "$@"; do
+        if [[ "$wt_arg" == "--" && -z "$path_file_inserted" ]]; then
+          wt_args+=(--path-file "$path_file")
+          path_file_inserted=1
+        fi
+        wt_args+=("$wt_arg")
+      done
+      if [[ -z "$path_file_inserted" ]]; then
+        wt_args+=(--path-file "$path_file")
+      fi
+      "$wt_bin" "${wt_args[@]}"
+      wt_status=$?
+      # -s guards the empty file mktemp created: cd only on a written target
+      if [[ $wt_status -eq 0 && -s "$path_file" ]]; then
+        target_path=$(<"$path_file"); cd "$target_path"
+      fi
+      rm -f "$path_file"
+      return $wt_status
+      ;;
+    *)
+      "$wt_bin" "$@"
+      ;;
+  esac
+}
+# Dynamic completions: call binary directly to bypass wt function
+if [[ -n "$ZSH_VERSION" ]]; then
+  _wt_bin=$(whence -p wt 2>/dev/null)
+  [[ -n "$_wt_bin" ]] && source <(COMPLETE=zsh "$_wt_bin" 2>/dev/null) 2>/dev/null
+else
+  _wt_bin=$(type -P wt 2>/dev/null)
+  [[ -n "$_wt_bin" ]] && source <(COMPLETE=bash "$_wt_bin" 2>/dev/null) 2>/dev/null
+fi
+unset _wt_bin
+# === agent-worktree END ===
