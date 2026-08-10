@@ -33,3 +33,17 @@ customCommands:
     context: "files"
     description: "Force update and reset all submodules"
     output: log
+
+  - key: "V"
+    context: "localBranches"
+    description: "Create selected branch's worktree with gwm"
+    command: >-
+      gwm create --name {{ .SelectedLocalBranch.Name | quote }} --reuse-branch
+    output: terminal
+
+  - key: "E"
+    context: "localBranches"
+    description: "Open selected branch's worktree in terminal"
+    command: >-
+      path="$(git worktree list --porcelain | awk -v branch={{ .SelectedLocalBranch.Name | quote }} '$1 == "worktree" { path = $2 } $1 == "branch" && substr($2, 12) == branch { print path; exit }')" && [ -n "$path" ] && cd "$path" && exec "${SHELL:-/bin/zsh}" -l
+    output: terminal
