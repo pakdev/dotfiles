@@ -8,8 +8,6 @@
   side-by-side = true
 [merge]
   conflictStyle = zdiff3
-[diff]
-  external = difft
 [include]
   path = ~/.config/delta/themes.gitconfig
 [user]
@@ -17,3 +15,5 @@
 	name = Peter Kurlak
 [init]
 	defaultBranch = main
+[diff]
+	external = difft

@@ -139,6 +139,9 @@ zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w 
 # Add opencode to PATH
 export PATH="$HOME/.opencode/bin:$PATH"
 
+# Add Cargo-installed binaries to PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Add shasum for microsandbox
 export PATH=/usr/bin/core_perl:$PATH
 
@@ -185,6 +188,9 @@ export STOWMAN_DOTDIR="$HOME/git/dotfiles/"
 # OpenCode alias
 alias oc='opencode'
 
+# GitHub Copilot autopilot alias
+alias co='copilot --autopilot --yolo'
+
 # Lazygit alias
 alias lg='lazygit --use-config-dir ~/.config/lazygit'
 
@@ -200,6 +206,27 @@ alias pete-ssh-tunnel-logs='journalctl --user -u pete-ssh-tunnel.service -f'
 alias pete-ssh-tunnel-start='systemctl --user start pete-ssh-tunnel.service'
 alias pete-ssh-tunnel-stop='systemctl --user stop pete-ssh-tunnel.service'
 alias pete-ssh-tunnel-restart='systemctl --user restart pete-ssh-tunnel.service'
+
+# Launch OMP with native Git diff headers so /review can parse PR-style diffs.
+# This preserves the global difft configuration for every other Git process.
+ompr() {
+  local config_dir="${XDG_CACHE_HOME:-$HOME/.cache}/omp"
+  local review_config exit_code
+
+  mkdir -p "$config_dir" || return 1
+  review_config="$(mktemp "$config_dir/gitconfig-review.XXXXXX")" || return 1
+
+  if ! sed '/^[[:space:]]*external[[:space:]]*=[[:space:]]*difft[[:space:]]*$/d' \
+    "$HOME/.gitconfig" > "$review_config"; then
+    rm -f -- "$review_config"
+    return 1
+  fi
+
+  GIT_CONFIG_GLOBAL="$review_config" command omp "$@"
+  exit_code=$?
+  rm -f -- "$review_config"
+  return "$exit_code"
+}
 
 # Open Yazi and change to its selected directory on exit.
 function y() {
