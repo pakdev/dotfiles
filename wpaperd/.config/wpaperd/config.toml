@@ -1,0 +1,8 @@
+[default]
+path = "/home/peter/Pictures/Wallpapers"
+duration = "30m"
+mode = "center"
+sorting = "random"
+queue-size = 20
+
+[default.transition.fade]

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/wpaperd/wallpapers"
+args=()
+
+if [[ -d "$state_dir" ]]; then
+    for link in "$state_dir"/*; do
+        [[ -e "$link" ]] || continue
+        output="$(basename "$link")"
+        target="$(readlink -f "$link")"
+        if [[ -f "$target" ]]; then
+            args+=(-i "${output}:${target}")
+        fi
+    done
+fi
+
+if [[ ${#args[@]} -eq 0 ]]; then
+    args+=(-i "/home/peter/Pictures/Wallpapers/runic-earth-0j_GEuMgjuE-unsplash.jpg")
+fi
+
+exec swaylock "${args[@]}" "$@"

@@ -1,0 +1,130 @@
+* {
+    font-family: "FiraCode Nerd Font", "Noto Sans", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(24, 24, 37, 0.88);
+    border-bottom: 1px solid rgba(127, 200, 255, 0.25);
+    color: #cdd6f4;
+}
+
+button {
+    border: none;
+    border-radius: 6px;
+}
+
+#workspaces {
+    margin: 4px 4px 4px 8px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    margin: 0 2px;
+    background-color: transparent;
+    color: #6c7086;
+    transition: all 0.15s ease;
+}
+
+#workspaces button:hover {
+    background-color: rgba(127, 200, 255, 0.15);
+    color: #cdd6f4;
+}
+
+#workspaces button.active {
+    color: #7fc8ff;
+    background-color: rgba(127, 200, 255, 0.15);
+}
+
+#workspaces button.focused {
+    color: #11111b;
+    background-color: #7fc8ff;
+}
+
+#workspaces button.urgent {
+    color: #11111b;
+    background-color: #f38ba8;
+}
+
+#window {
+    color: #cdd6f4;
+    font-weight: 500;
+}
+
+#mpris,
+#custom-wallpaper,
+#idle_inhibitor,
+#wireplumber,
+#network,
+#cpu,
+#memory,
+#language,
+#clock,
+#tray,
+#custom-lock {
+    padding: 0 10px;
+    margin: 4px 2px;
+    border-radius: 6px;
+    background-color: rgba(49, 50, 68, 0.7);
+    color: #cdd6f4;
+}
+
+#custom-wallpaper {
+    color: #cba6f7;
+}
+
+#custom-wallpaper:hover,
+#custom-lock:hover,
+#idle_inhibitor:hover,
+#wireplumber:hover {
+    background-color: rgba(69, 71, 90, 0.9);
+}
+
+#idle_inhibitor.activated {
+    background-color: #f9e2af;
+    color: #11111b;
+}
+
+#wireplumber {
+    color: #89b4fa;
+}
+
+#wireplumber.muted {
+    color: #6c7086;
+}
+
+#network {
+    color: #a6e3a1;
+}
+
+#network.disconnected {
+    color: #f38ba8;
+}
+
+#cpu {
+    color: #fab387;
+}
+
+#memory {
+    color: #f5c2e7;
+}
+
+#clock {
+    color: #7fc8ff;
+    font-weight: 600;
+}
+
+#custom-lock {
+    color: #f38ba8;
+    margin-right: 8px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #f38ba8;
+}

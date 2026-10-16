@@ -7,11 +7,18 @@ My personal configuration files managed with GNU Stow.
 - **zsh**: Zsh shell configuration
 - **git**: Git configuration
 - **alacritty**: Alacritty terminal emulator
+- **ghostty**: Ghostty terminal emulator
 - **nvim**: Neovim (LazyVim) configuration
 - **zellij**: Zellij terminal multiplexer
 - **lazygit**: LazyGit TUI configuration
 - **lazydocker**: LazyDocker TUI configuration
 - **starship**: Starship prompt configuration
+- **cosmic**: Dark violet COSMIC theme, always-visible translucent panel/dock, nebula wallpaper, and FiraCode Nerd Font terminal palette
+- **niri**: Niri scrollable-tiling Wayland compositor configuration (with `swaybg` overview backdrop)
+- **waybar**: Waybar status bar configuration and styling for Niri
+- **wpaperd**: Wallpaper daemon configuration for rotating workspace backgrounds
+- **fuzzel**: Fuzzel application launcher configuration
+- **swaylock**: Swaylock screen locker configuration and `~/.local/bin/lock-screen` helper
 
 ## Installation
 
@@ -28,7 +35,7 @@ My personal configuration files managed with GNU Stow.
 3. Stow the packages you want:
    ```bash
    cd ~/dotfiles
-   stow zsh git alacritty nvim zellij lazygit lazydocker starship
+   stow zsh git alacritty ghostty nvim zellij lazygit lazydocker starship niri waybar wpaperd fuzzel swaylock
    ```
 
    Or stow individual packages:
@@ -105,6 +112,19 @@ Windows limitations:
 - **Add new configs**: Move the file/directory to the appropriate package folder, then run `stow <package>`
 - **Remove symlinks**: `stow -D <package>`
 - **Restow (refresh)**: `stow -R <package>`
+
+## COSMIC appearance
+
+Stow `cosmic` to link its settings, then apply the native theme preset:
+
+```bash
+cosmic-settings appearance import "$HOME/git/dotfiles/cosmic/violet.ron"
+```
+
+The panel and floating dock never auto-hide and reserve space for windows. The
+wallpaper uses the Orion nebula image supplied by `cosmic-wallpapers`; COSMIC
+Terminal uses the installed `FiraCode Nerd Font` and the `Space Station` palette.
+The preset changes COSMIC settings only, not GNOME themes or extensions.
 
 ## Notes
 

@@ -1,0 +1,113 @@
+// -*- mode: jsonc -*-
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 6,
+    "modules-left": [
+        "niri/workspaces",
+        "custom/wallpaper",
+        "mpris"
+    ],
+    "modules-center": [
+        "niri/window"
+    ],
+    "modules-right": [
+        "idle_inhibitor",
+        "wireplumber",
+        "network",
+        "cpu",
+        "memory",
+        "niri/language",
+        "clock",
+        "tray",
+        "custom/lock"
+    ],
+    "niri/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+    "niri/window": {
+        "format": "{}",
+        "max-length": 60,
+        "rewrite": {
+            "(.*) - Mozilla Firefox": "🌎 $1",
+            "(.*) - Chromium": "🌎 $1"
+        },
+        "separate-outputs": true
+    },
+    "niri/language": {
+        "format": " {short}"
+    },
+    "mpris": {
+        "format": "{player_icon} {dynamic}",
+        "format-paused": "{status_icon} <i>{dynamic}</i>",
+        "max-length": 40,
+        "player-icons": {
+            "default": "",
+            "mpv": "🎵"
+        },
+        "status-icons": {
+            "paused": ""
+        }
+    },
+    "custom/wallpaper": {
+        "format": "",
+        "tooltip-format": "Wallpaper (Left: next, Right: prev, Middle: pause/resume)",
+        "on-click": "wpaperctl next",
+        "on-click-right": "wpaperctl previous",
+        "on-click-middle": "wpaperctl toggle-pause"
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        },
+        "tooltip-format-activated": "Idle inhibitor: ON",
+        "tooltip-format-deactivated": "Idle inhibitor: OFF"
+    },
+    "wireplumber": {
+        "format": "{icon} {volume}%",
+        "format-muted": " Muted",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "scroll-step": 5,
+        "format-icons": ["", "", ""]
+    },
+    "network": {
+        "format-wifi": " {essid} ({signalStrength}%)",
+        "format-ethernet": "󰈀 {ipaddr}",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "format-linked": "󰈀 {ifname} (No IP)",
+        "format-disconnected": "⚠ Disconnected",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "cpu": {
+        "format": " {usage}%",
+        "interval": 5,
+        "tooltip": true
+    },
+    "memory": {
+        "format": " {percentage}%",
+        "interval": 5,
+        "tooltip-format": "{used:0.1f}GiB / {total:0.1f}GiB"
+    },
+    "clock": {
+        "format": " {:%a %b %d  %H:%M}",
+        "format-alt": " {:%Y-%m-%d %H:%M:%S}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "tray": {
+        "icon-size": 18,
+        "spacing": 8
+    },
+    "custom/lock": {
+        "format": "",
+        "tooltip-format": "Left-click: Lock screen (swaylock)\nRight-click: Power off monitors",
+        "on-click": "/home/peter/.local/bin/lock-screen",
+        "on-click-right": "niri msg action power-off-monitors"
+    }
+}
