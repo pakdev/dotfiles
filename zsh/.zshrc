@@ -151,6 +151,9 @@ export PATH="$HOME/.local/bin:$PATH"
 # Add devenv to PATH
 export PATH="$HOME/.nix-profile/bin:$PATH"
 
+# Add omp to path
+export PATH="$HOME/.bun/bin:$PATH"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment

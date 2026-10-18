@@ -7,9 +7,9 @@ gui:
     selectedRangeBgColor:
       - reverse
 git:
-  pagers:
+  diffRenderers:
     - colorArg: never
-      pager: delta --dark --paging=never --line-numbers --features chameleon
+      command: delta --dark --paging=never --line-numbers --features chameleon
 customCommands:
   - key: "U"
     command: "git submodule update --init --recursive --force"
