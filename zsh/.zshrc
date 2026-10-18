@@ -139,6 +139,9 @@ zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w 
 # Add opencode to PATH
 export PATH="$HOME/.opencode/bin:$PATH"
 
+# Add Cargo-installed binaries to PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Add shasum for microsandbox
 export PATH=/usr/bin/core_perl:$PATH
 
@@ -153,6 +156,9 @@ export PATH="$HOME/.nix-profile/bin:$PATH"
 
 # Add omp to path
 export PATH="$HOME/.bun/bin:$PATH"
+# Initialize pyenv so local Python versions resolve through shims.
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -184,6 +190,9 @@ export STOWMAN_DOTDIR="$HOME/git/dotfiles/"
 # OpenCode alias
 alias oc='opencode'
 
+# GitHub Copilot autopilot alias
+alias co='copilot --autopilot --yolo'
+
 # Lazygit alias
 alias lg='lazygit --use-config-dir ~/.config/lazygit'
 
@@ -193,6 +202,47 @@ alias ld='lazydocker'
 # Docker summary alias (id, name, image)
 alias dss='docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}"'
 
+# Pete SSH reverse tunnel aliases
+alias pete-ssh-tunnel-status='systemctl --user status pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-logs='journalctl --user -u pete-ssh-tunnel.service -f'
+alias pete-ssh-tunnel-start='systemctl --user start pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-stop='systemctl --user stop pete-ssh-tunnel.service'
+alias pete-ssh-tunnel-restart='systemctl --user restart pete-ssh-tunnel.service'
+
+# Launch OMP with native Git diff headers so /review can parse PR-style diffs.
+# This preserves the global difft configuration for every other Git process.
+ompr() {
+  local config_dir="${XDG_CACHE_HOME:-$HOME/.cache}/omp"
+  local review_config exit_code
+
+  mkdir -p "$config_dir" || return 1
+  review_config="$(mktemp "$config_dir/gitconfig-review.XXXXXX")" || return 1
+
+  if ! sed '/^[[:space:]]*external[[:space:]]*=[[:space:]]*difft[[:space:]]*$/d' \
+    "$HOME/.gitconfig" > "$review_config"; then
+    rm -f -- "$review_config"
+    return 1
+  fi
+
+  GIT_CONFIG_GLOBAL="$review_config" command omp "$@"
+  exit_code=$?
+  rm -f -- "$review_config"
+  return "$exit_code"
+}
+
+# Open Yazi and change to its selected directory on exit.
+function y() {
+  local tmp
+  tmp="$(mktemp -t 'yazi-cwd.XXXXXX')"
+  yazi "$@" --cwd-file="$tmp"
+
+  if read -r cwd < "$tmp" && [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+    builtin cd -- "$cwd"
+  fi
+
+  rm -f -- "$tmp"
+}
+
 # Added by ni-dev-tools setup - Go tools PATH
 export PATH="$HOME/go/bin:$PATH"
 
@@ -201,6 +251,12 @@ eval "$(starship init zsh)"
 
 # Initialize direnv (DIRENV_LOG_FORMAT="" suppresses the "direnv: export" line)
 eval "$(direnv hook zsh)"
+
+# Initialize pyenv after PATH setup so its shims take precedence.
+eval "$(pyenv init - zsh)"
+
+# Initialize mise
+eval "$(mise activate zsh)"
 
 # bun completions
 [ -s "/home/peter/.bun/_bun" ] && source "/home/peter/.bun/_bun"
@@ -216,3 +272,78 @@ if [[ -f "$ZSH_PLUGIN_PREFIX/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 elif [[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
   source "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/peter.kurlak/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# mise
+eval "$(mise activate zsh)"
+
+# === agent-worktree BEGIN ===
+# NOTE: Don't use 'path'/'status' as variable names - zsh reserves them
+wt() {
+  local wt_bin path_file target_path wt_status wt_arg path_file_inserted
+  local -a wt_args
+  if [[ -n "$ZSH_VERSION" ]]; then
+    wt_bin=$(whence -p wt 2>/dev/null)
+  else
+    wt_bin=$(type -P wt 2>/dev/null)
+  fi
+  if [[ -z "$wt_bin" ]]; then
+    echo "wt: binary not found. Install: npm install -g agent-worktree" >&2
+    return 1
+  fi
+  # Pass through if -h/--help anywhere in args
+  case " $* " in
+    *" -h "*|*" --help "*) "$wt_bin" "$@"; return ;;
+  esac
+  case "$1" in
+    cd|new|rm|mv|merge|clean|run)
+      # Use mktemp so concurrent calls (and subshells where $$ is the parent
+      # PID) get unique files; fall back to PID-based name if mktemp missing.
+      path_file=$(mktemp 2>/dev/null) || path_file="${TMPDIR:-/tmp}/wt-path-$$"
+      # `wt run -- <agent>` treats every argument after `--` as belonging to
+      # the agent, so inject the wrapper option before that delimiter.
+      wt_args=()
+      path_file_inserted=
+      for wt_arg in "$@"; do
+        if [[ "$wt_arg" == "--" && -z "$path_file_inserted" ]]; then
+          wt_args+=(--path-file "$path_file")
+          path_file_inserted=1
+        fi
+        wt_args+=("$wt_arg")
+      done
+      if [[ -z "$path_file_inserted" ]]; then
+        wt_args+=(--path-file "$path_file")
+      fi
+      "$wt_bin" "${wt_args[@]}"
+      wt_status=$?
+      # -s guards the empty file mktemp created: cd only on a written target
+      if [[ $wt_status -eq 0 && -s "$path_file" ]]; then
+        target_path=$(<"$path_file"); cd "$target_path"
+      fi
+      rm -f "$path_file"
+      return $wt_status
+      ;;
+    *)
+      "$wt_bin" "$@"
+      ;;
+  esac
+}
+# Dynamic completions: call binary directly to bypass wt function
+if [[ -n "$ZSH_VERSION" ]]; then
+  _wt_bin=$(whence -p wt 2>/dev/null)
+  [[ -n "$_wt_bin" ]] && source <(COMPLETE=zsh "$_wt_bin" 2>/dev/null) 2>/dev/null
+else
+  _wt_bin=$(type -P wt 2>/dev/null)
+  [[ -n "$_wt_bin" ]] && source <(COMPLETE=bash "$_wt_bin" 2>/dev/null) 2>/dev/null
+fi
+unset _wt_bin
+# === agent-worktree END ===

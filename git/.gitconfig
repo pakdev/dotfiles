@@ -1,5 +1,6 @@
 [core]
   pager = delta
+  hooksPath = ~/.config/git/hooks
 [interactive]
   diffFilter = delta --color-only
 [delta]
@@ -7,10 +8,12 @@
   side-by-side = true
 [merge]
   conflictStyle = zdiff3
-[diff]
-  external = difft
 [include]
   path = ~/.config/delta/themes.gitconfig
 [user]
 	email = peter.kurlak@emerson.com
 	name = Peter Kurlak
+[init]
+	defaultBranch = main
+[diff]
+	external = difft

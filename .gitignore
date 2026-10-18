@@ -9,3 +9,4 @@ Thumbs.db
 
 # Ignore LazyGit state
 state.yml
+github_pull_requests.json

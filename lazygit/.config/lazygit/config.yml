@@ -10,9 +10,38 @@ git:
   diffRenderers:
     - colorArg: never
       command: delta --dark --paging=never --line-numbers --features chameleon
+
 customCommands:
+  - key: "t"
+    command: "open -na Ghostty.app --args -e zsh -lc 'cd {{.SelectedWorktree.Path | quote}} && exec zsh -l'"
+    context: "worktrees"
+    description: "Open selected worktree in Ghostty"
+  - key: "O"
+    context: "global"
+    description: "Launch OpenCode"
+    command: "opencode"
+    output: terminal
+  - key: "C"
+    context: "global"
+    description: "Launch GitHub Copilot with YOLO enabled"
+    command: "copilot --yolo"
+    output: terminal
   - key: "U"
     command: "git submodule update --init --recursive --force"
     context: "files"
     description: "Force update and reset all submodules"
     output: log
+
+  - key: "V"
+    context: "localBranches"
+    description: "Create selected branch's worktree with gwm"
+    command: >-
+      gwm create --name {{ .SelectedLocalBranch.Name | quote }} --reuse-branch
+    output: terminal
+
+  - key: "E"
+    context: "localBranches"
+    description: "Open selected branch's worktree in terminal"
+    command: >-
+      path="$(git worktree list --porcelain | awk -v branch={{ .SelectedLocalBranch.Name | quote }} '$1 == "worktree" { path = $2 } $1 == "branch" && substr($2, 12) == branch { print path; exit }')" && [ -n "$path" ] && cd "$path" && exec "${SHELL:-/bin/zsh}" -l
+    output: terminal
